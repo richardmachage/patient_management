@@ -6,8 +6,14 @@ import java.util.UUID
 
 @Entity
 data class PatientsEntity(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val name : String = "",
-    val age : String = "",
-    val gender : String = "",
+    @PrimaryKey
+    val uniqueId: String /*= UUID.randomUUID().toString()*/,
+    val patientId : String?,
+    val firstname :  String,
+    val lastname : String,
+    val regDate : String,
+    val gender : String,
+    val dateOfBirth : String,
+    val isSynced : Boolean = false
+
 )
