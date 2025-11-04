@@ -11,6 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import dev.forsythe.patientmanagement.core.ui.navigation.NavRoutes
+import dev.forsythe.patientmanagement.core.ui.navigation.PmNavGraph
 import dev.forsythe.patientmanagement.core.ui.theme.PatientManagementTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,27 +22,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PatientManagementTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android", modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                val navController = rememberNavController()
+
+                PmNavGraph(
+                    navController = navController,
+                    startDestination = NavRoutes.PatientsList
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!", modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PatientManagementTheme {
-        Greeting("Android")
     }
 }

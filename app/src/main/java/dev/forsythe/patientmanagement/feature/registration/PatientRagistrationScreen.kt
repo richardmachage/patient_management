@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import dev.forsythe.patientmanagement.R
 import dev.forsythe.patientmanagement.core.model.Gender
 import dev.forsythe.patientmanagement.core.ui.components.FormDatePicker
@@ -39,15 +41,14 @@ import dev.forsythe.patientmanagement.core.ui.components.VerticalSpacer
 import dev.forsythe.patientmanagement.core.ui.components.buttons.PrimaryButton
 import dev.forsythe.patientmanagement.core.ui.components.buttons.SecondaryButton
 import dev.forsythe.patientmanagement.core.ui.components.paddingMedium
+import dev.forsythe.patientmanagement.core.ui.navigation.NavRoutes
 import dev.forsythe.patientmanagement.core.ui.theme.PatientManagementTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatientRegistrationScreen(
-    onNavigateBack: () -> Unit,
-    onSavePatient: (/*...patient data...*/) -> Unit,
-    onClose: () -> Unit
+    navController: NavController,
 ) {
 
     var patientNumber by remember { mutableStateOf("") }
@@ -63,7 +64,7 @@ fun PatientRegistrationScreen(
             TopAppBar(
                 title = { Text(text = stringResource(R.string.new_patient_registration) )},
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = {navController.navigateUp()}) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -143,12 +144,15 @@ fun PatientRegistrationScreen(
             VerticalSpacer(15)
 
             Box (
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(bottom = paddingMedium),
                 contentAlignment = Alignment.BottomCenter
             ){
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = paddingMedium),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = paddingMedium),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     //close button
@@ -163,7 +167,11 @@ fun PatientRegistrationScreen(
                     PrimaryButton(
                         modifier = Modifier.weight(1f),
                         text = stringResource(R.string.save),
-                        onClick = {})
+                        onClick = {
+                            navController.navigate(NavRoutes.Assessment(patientId = "randokujsn"))
+
+                        }
+                    )
                 }
 
             }
@@ -181,9 +189,7 @@ private fun PatientRegistrationScreenPreview() {
     PatientManagementTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             PatientRegistrationScreen(
-                onNavigateBack = {},
-                onSavePatient = {},
-                onClose = {}
+                navController = rememberNavController()
             )
         }
     }
