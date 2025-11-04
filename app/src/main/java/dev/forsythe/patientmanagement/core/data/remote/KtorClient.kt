@@ -1,5 +1,6 @@
-package dev.forsythe.patientmanagement.core.data.remote.network
+package dev.forsythe.patientmanagement.core.data.remote
 
+import dev.forsythe.patientmanagement.utils.BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
@@ -11,7 +12,9 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class KtorClient(){
+class KtorClient(
+    baseUrl : String = BASE_URL
+){
     val client = HttpClient(OkHttp) {
 
         install(Logging  ){

@@ -1,9 +1,9 @@
-package dev.forsythe.patientmanagement.core.data.remote.network.model.response
+package dev.forsythe.patientmanagement.core.data.remote.model.response
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ViewPatientResponse(
+data class GetPatientsResponse(
     val code: Int,
     val `data`: List<PatientData>,
     val message: String,

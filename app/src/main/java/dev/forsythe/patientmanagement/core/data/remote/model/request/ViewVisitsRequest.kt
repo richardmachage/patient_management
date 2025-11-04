@@ -1,4 +1,4 @@
-package dev.forsythe.patientmanagement.core.data.remote.network.model.request
+package dev.forsythe.patientmanagement.core.data.remote.model.request
 
 import kotlinx.serialization.Serializable
 
