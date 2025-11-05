@@ -51,6 +51,8 @@ import dev.forsythe.patientmanagement.core.ui.components.paddingMedium
 import dev.forsythe.patientmanagement.core.ui.components.texts.ReadOnlyTextField
 import dev.forsythe.patientmanagement.core.ui.navigation.NavRoutes
 import dev.forsythe.patientmanagement.core.ui.theme.PatientManagementTheme
+import dev.forsythe.patientmanagement.utils.convertDateToMillis
+import dev.forsythe.patientmanagement.utils.convertMillisToDate
 import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.time.LocalDate
@@ -224,7 +226,12 @@ fun PatientRegistrationScreen(
                         modifier = Modifier.weight(1f),
                         text = stringResource(R.string.save),
                         onClick = {
-                            viewModel.onSaveClicked()
+
+                            viewModel.onSaveClicked(
+                                onCompleted = {
+                                    navController.navigate(NavRoutes.Vitals(patientId = uiState.patientNumber))
+                                }
+                            )
                         },
                         enabled = !uiState.isLoading
                     )
@@ -233,7 +240,6 @@ fun PatientRegistrationScreen(
                 if (uiState.isLoading) {
                     CircularProgressIndicatorPm(isLoading = true, displayText = "Loading")
                 }
-
             }
         }
     }
@@ -247,31 +253,15 @@ private enum class OpenDatePicker {
 }
 
 
-private val uiDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-private fun convertMillisToDate(millis: Long): String {
-    return Instant.ofEpochMilli(millis)
-        .atZone(ZoneId.systemDefault())
-        .toLocalDate()
-        .format(uiDateFormatter)
-}
 
-private fun convertDateToMillis(dateString: String): Long? {
-    return try {
-        val localDate = LocalDate.parse(dateString, uiDateFormatter)
-        localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    } catch (e: Exception) {
-        null // Return null if string is empty or invalid
-    }
-}
 @Preview(showBackground = true)
 @Composable
 private fun PatientRegistrationScreenPreview() {
-    // You'd wrap this in your AppTheme
     PatientManagementTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            PatientRegistrationScreen(
+           /* PatientRegistrationScreen(
                 navController = rememberNavController()
-            )
+            )*/
         }
     }
 

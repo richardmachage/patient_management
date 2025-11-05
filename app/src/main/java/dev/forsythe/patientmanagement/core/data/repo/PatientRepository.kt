@@ -71,10 +71,7 @@ interface PatientRepository {
      */
     suspend fun doesPatientExist(patientId: String): Boolean
 
+    suspend fun getPatient(patientId: String): PatientsEntity?
+
 }
 
-/**
- * A custom data class specifically for the Patient Listing page.
- * This is what the repository will provide to the ViewModel,
- * already processed.
- */

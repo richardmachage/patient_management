@@ -1,6 +1,7 @@
 package dev.forsythe.patientmanagement.core.ui.components
 
 import android.R.attr.label
+import android.R.attr.singleLine
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -36,13 +38,18 @@ fun FormDatePicker(
             readOnly = true,
             placeholder = { Text(placeholder) },
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.CalendarToday, contentDescription = "Select Date"
-                )
+                IconButton(
+                    onClick = onDateClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CalendarToday, contentDescription = "Select Date"
+                    )
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onDateClick), // Make the whole field clickable
+                //.clickable(onClick = onDateClick)
+            , // Make the whole field clickable
             singleLine = true,
             shape = RoundedCornerShape(30)
 

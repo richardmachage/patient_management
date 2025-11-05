@@ -32,12 +32,27 @@ interface PatientsDao {
 
     @Transaction
     @Query("""
-    SELECT * FROM PatientsEntity
+    SELECT 
+        p.*, -- All columns from PatientsEntity, mapped to the 'patient' object
+
+        -- Aliased columns from the vitals subquery 'v' to match the 'vital_' prefix
+        v.id AS vital_id,
+        v.patientId AS vital_patientId,
+        v.visitDate AS vital_visitDate,
+        v.height AS vital_height,
+        v.weight AS vital_weight,
+        v.isSynced AS vital_isSynced,
+        
+        -- Calculate BMI on the fly and alias it
+        (v.weight / (v.height * v.height)) AS vital_bmi 
+        
+    FROM PatientsEntity AS p
     LEFT JOIN (
-        SELECT * FROM VitalsEntity
-        GROUP BY patientId
-        HAVING MAX(visitDate)
-    ) AS latest_vitals ON PatientsEntity.uniqueId = latest_vitals.patientId
+        SELECT *,
+               -- Partition by 'patientId' (the foreign key in VitalsEntity)
+               ROW_NUMBER() OVER(PARTITION BY patientId ORDER BY visitDate DESC) as rn
+        FROM VitalsEntity
+    ) AS v ON p.uniqueId = v.patientId AND v.rn = 1
 """)
     fun getPatientsWithLatestVitals(): Flow<List<PatientWithLatestVital>>
 }

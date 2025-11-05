@@ -20,10 +20,18 @@ data class PatientsEntity(
 )
 
 
-data class PatientWithLatestVital(
+/*data class PatientWithLatestVital(
     @Embedded
     val patient: PatientsEntity,
 
     @Embedded
     val vital: VitalsEntity? // Nullable, in case a patient has no vitals yet
+)*/
+
+data class PatientWithLatestVital(
+    @Embedded
+    val patient: PatientsEntity, // Room maps columns like 'uniqueId', 'firstName'
+
+    @Embedded(prefix = "vital_")
+    val vital: VitalsEntity?      // Room will now look for 'vital_id', 'vital_visitDate', etc.
 )

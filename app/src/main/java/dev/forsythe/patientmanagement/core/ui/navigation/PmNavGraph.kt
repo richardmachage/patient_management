@@ -38,8 +38,7 @@ fun PmNavGraph(
         }
 
         composable <NavRoutes.Assessment> (
-            enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
+
         ){
             AssessmentScreen(
                 navController = navController

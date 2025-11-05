@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.forsythe.patientmanagement.core.data.repo.PatientRepository
 import dev.forsythe.patientmanagement.core.data.room.entities.patients.PatientsEntity
+import dev.forsythe.patientmanagement.utils.formatDateForDb
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -56,7 +57,9 @@ class PatientRegistrationViewModel(
 
 
 
-    fun onSaveClicked() {
+    fun onSaveClicked(
+        onCompleted: () -> Unit
+    ) {
         if (!validateInputs()) {
             return // Validation failed, errors are set
         }
@@ -96,6 +99,8 @@ class PatientRegistrationViewModel(
                         isRegistrationSuccessful = true
                     )
                 }
+
+                onCompleted()
             }.onFailure { error ->
                 _uiState.update {
                     it.copy(
@@ -138,16 +143,4 @@ class PatientRegistrationViewModel(
         return isValid
     }
 
-
-
-    private fun formatDateForDb(date: String): String {
-        return try {
-            val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            val outputFormatter = DateTimeFormatter.ISO_LOCAL_DATE // "YYYY-MM-DD"
-            LocalDate.parse(date, inputFormatter).format(outputFormatter)
-        } catch (e: Exception) {
-            //  return original if format is wrong
-            date
-        }
-    }
 }

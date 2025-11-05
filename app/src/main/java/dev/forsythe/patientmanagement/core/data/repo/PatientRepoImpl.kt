@@ -16,10 +16,13 @@ import dev.forsythe.patientmanagement.core.model.BmiStatus
 import dev.forsythe.patientmanagement.feature.patients.BmiStatusChip
 import dev.forsythe.patientmanagement.feature.patients.PatientListItem
 import dev.forsythe.patientmanagement.feature.patients.model.PatientListingItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.Period
@@ -45,23 +48,24 @@ class PatientRepoImpl (
         email: String,
         password: String,
     ): Result<Unit> {
-        return try {
-            val request = LogInRequest(email, password)
-            // Call the Ktor extension function
-            val logInData = api.logIn(request)
+        return withContext(Dispatchers.IO) {
+            try {
+                val request = LogInRequest(email, password)
+                // Call the Ktor extension function
+                val logInData = api.logIn(request)
 
 
-            // Save the token on success
-            sharedPref.saveData(
-                key = SharedPreferences.ACCESS_TOKEN,
-                value = logInData.access_token
-            )
+                // Save the token on success
+                sharedPref.saveData(
+                    key = SharedPreferences.ACCESS_TOKEN, value = logInData.access_token
+                )
 
-            Timber.tag(TAG).d("Login successful")
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Timber.tag(TAG).e(e)
-            Result.failure(e)
+                Timber.tag(TAG).d("Login successful")
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e)
+                Result.failure(e)
+            }
         }
     }
 
@@ -71,7 +75,7 @@ class PatientRepoImpl (
         lastName: String,
         password: String,
     ): Result<Unit> {
-        return try {
+        return withContext(Dispatchers.IO) {try {
             val request = SignUpRequest(email, firstName, lastName, password)
             // Call the Ktor extension function
            val data =  api.signUp(request)
@@ -82,71 +86,84 @@ class PatientRepoImpl (
             Result.failure(e)
         }
     }
+        }
 
     override suspend fun registerPatient(patient: PatientsEntity): Result<String> {
-        return  try {
-            patientsDao.insertPatient(patient)
-            Timber.tag(TAG).d("Patient registered successfully")
-            Result.success(patient.uniqueId)
-        }catch (e : Exception){
-            Timber.tag(TAG).e(e)
-            Result.failure(e.cause ?: Exception("Unknown error"))
+        return withContext(Dispatchers.IO) {
+            try {
+                patientsDao.insertPatient(patient)
+                Timber.tag(TAG).d("Patient registered successfully")
+                Result.success(patient.uniqueId)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e)
+                Result.failure(e.cause ?: Exception("Unknown error"))
+            }
         }
     }
 
     override suspend fun saveVitals(vitals: VitalsEntity): Result<String> {
-        return  try {
-            vitalsDao.insertVitals(vitals)
-            Timber.tag(TAG).d("Vitals saved successfully")
-            Result.success(vitals.id)
-        } catch (e : Exception){
-            Timber.tag(TAG).e(e)
-            Result.failure(e.cause ?: Exception("Unknown error"))
+        return withContext(Dispatchers.IO) {
+
+            try {
+                vitalsDao.insertVitals(vitals)
+                Timber.tag(TAG).d("Vitals saved successfully")
+                Result.success(vitals.id)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e)
+                Result.failure(e.cause ?: Exception("Unknown error"))
+            }
         }
     }
 
     override suspend fun saveAssessment(assessment: AssessmentEntity): Result<String> {
-        return try {
-            assessmentDao.insertAssessment(assessment)
-            Timber.tag(TAG).d("Assessment saved successfully")
-            Result.success(assessment.id)
-        }catch (e : Exception){
-            Timber.tag(TAG).e(e)
-            Result.failure(e.cause ?: Exception("Unknown error"))
+        return withContext(Dispatchers.IO) {
+            try {
+                assessmentDao.insertAssessment(assessment)
+                Timber.tag(TAG).d("Assessment saved successfully")
+                Result.success(assessment.id)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e)
+                Result.failure(e.cause ?: Exception("Unknown error"))
+            }
         }
+    }
+
+    override suspend fun getPatient(patientId: String): PatientsEntity? {
+        return withContext(Dispatchers.IO){patientsDao.getPatientByUniqueId(patientId)}
     }
 
     override fun getPatientListings(): Flow<List<PatientListingItem>> {
         return try {
-            patientsDao.getPatientsWithLatestVitals()
-                .map {patientWithVitalsList->
-                    patientWithVitalsList.map { patientWithVital ->
-                        val patient = patientWithVital.patient
-                        val latestVital = patientWithVital.vital // This can be null
 
-                        val bmi = latestVital?.bmi?:0.0
-                        val bmiStatus = getBmiStatus(bmi)?: BmiStatus.Normal
+                patientsDao.getPatientsWithLatestVitals().map { patientWithVitalsList ->
+                        patientWithVitalsList.map { patientWithVital ->
+                            val patient = patientWithVital.patient
+                            val latestVital = patientWithVital.vital // This can be null
 
-                        PatientListingItem(
-                            patientId = patient.uniqueId,
-                            patientName = patient.firstname + " " + patient.lastname,
-                            age = calculateAge(dobString = patient.dateOfBirth),
-                            lastVisitDate = latestVital?.visitDate ?: patient.regDate, // Fallback
-                            lastBmiStatus = bmiStatus,
-                            lastBmi = bmi
-                        )
+                            val bmi = latestVital?.bmi ?: 0.0
+                            val bmiStatus = getBmiStatus(bmi) ?: BmiStatus.Normal
+
+                            PatientListingItem(
+                                patientId = patient.uniqueId,
+                                patientName = patient.firstname + " " + patient.lastname,
+                                age = calculateAge(dobString = patient.dateOfBirth),
+                                lastVisitDate = latestVital?.visitDate
+                                    ?: patient.regDate, // Fallback
+                                lastBmiStatus = bmiStatus,
+                                lastBmi = bmi
+                            )
+                        }
+
                     }
 
-                }
-
-        }catch (e : Exception){
-            Timber.tag(TAG).e(e)
-            flow{  }
-        }
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e)
+                flow { }
+            }
     }
 
     override suspend fun doesPatientExist(patientId: String): Boolean {
-        return patientsDao.getPatientByUniqueId(patientId) != null
+        return withContext(Dispatchers.IO){ patientsDao.getPatientByUniqueId(patientId) != null}
     }
 
     private fun calculateAge(dobString: String): Int {
