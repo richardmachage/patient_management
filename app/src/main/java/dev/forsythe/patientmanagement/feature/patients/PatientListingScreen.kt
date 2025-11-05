@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import dev.forsythe.patientmanagement.core.ui.components.EmptyState
@@ -37,8 +36,6 @@ import dev.forsythe.patientmanagement.core.ui.components.FormDatePicker
 import dev.forsythe.patientmanagement.core.ui.components.dialogs.DatePickerPm
 import dev.forsythe.patientmanagement.core.ui.navigation.NavRoutes
 import dev.forsythe.patientmanagement.core.ui.theme.PatientManagementTheme
-import dev.forsythe.patientmanagement.feature.patients.model.PatientListingItem
-import dev.forsythe.patientmanagement.feature.patients.model.mockPatients
 import dev.forsythe.patientmanagement.utils.convertDateToMillis
 import org.koin.androidx.compose.koinViewModel
 

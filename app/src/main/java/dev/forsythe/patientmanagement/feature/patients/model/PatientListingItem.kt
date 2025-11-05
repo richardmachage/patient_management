@@ -11,10 +11,3 @@ data class PatientListingItem(
     val lastBmi: Double?,        // The most recent BMI value
     val lastBmiStatus: BmiStatus    // "Underweight", "Normal", "Overweight"
 )
-
-
-val mockPatients = listOf(
-    PatientListingItem("1", "Eleanor Pena", 32, "Oct 26, 2023", 21.5, BmiStatus.Normal),
-    PatientListingItem("2", "Cody Fisher", 45, "Oct 26, 2023", 28.1, BmiStatus.Overweight),
-    PatientListingItem("3", "Esther Howard", 51, "Oct 26, 2023", 18.2, BmiStatus.Underweight)
-)
