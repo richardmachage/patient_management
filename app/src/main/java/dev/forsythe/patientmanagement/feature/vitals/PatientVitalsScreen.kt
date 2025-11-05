@@ -187,6 +187,7 @@ fun PatientVitalsScreen(
             )
 
 
+            VerticalSpacer(25)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -207,9 +208,11 @@ fun PatientVitalsScreen(
                         enabled = !uiState.isLoading
                     )
                     PrimaryButton(
-                        text = "Save", onClick = {
-                            navController.navigate(NavRoutes.PatientsList)
-                        }, modifier = Modifier.weight(1f),
+                        text = "Save",
+                        onClick = {
+                            viewModel.onSaveClicked()
+                        },
+                        modifier = Modifier.weight(1f),
                         enabled = !uiState.isLoading
                     )
                 }
