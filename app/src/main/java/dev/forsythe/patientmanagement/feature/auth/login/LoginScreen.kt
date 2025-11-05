@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.forsythe.patientmanagement.core.ui.components.CircularProgressIndicatorPm
 import dev.forsythe.patientmanagement.core.ui.components.FormTextField
+import dev.forsythe.patientmanagement.core.ui.components.PasswordTextField
 import dev.forsythe.patientmanagement.core.ui.components.VerticalSpacer
 import dev.forsythe.patientmanagement.core.ui.components.buttons.PrimaryButton
 import dev.forsythe.patientmanagement.core.ui.components.buttons.SecondaryButton
@@ -104,15 +105,14 @@ fun LoginScreen(
                 VerticalSpacer(16)
 
                 // Password
-                FormTextField(
+                PasswordTextField(
                     label = "Password",
                     value = uiState.password,
                     onValueChange = viewModel::onPasswordChange,
                     placeholder = "Enter your password",
-                   // visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     isError = uiState.loginError != null
                 )
+
                 VerticalSpacer(8)
 
                 // Error message

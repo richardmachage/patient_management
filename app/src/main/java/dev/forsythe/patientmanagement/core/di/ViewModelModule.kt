@@ -2,6 +2,7 @@ package dev.forsythe.patientmanagement.core.di
 
 import dev.forsythe.patientmanagement.feature.assessment.AssessmentViewModel
 import dev.forsythe.patientmanagement.feature.auth.login.LoginViewModel
+import dev.forsythe.patientmanagement.feature.auth.sign_up.SignUpViewModel
 import dev.forsythe.patientmanagement.feature.patients.PatientListingViewModel
 import dev.forsythe.patientmanagement.feature.registration.PatientRegistrationViewModel
 import dev.forsythe.patientmanagement.feature.vitals.VitalsViewModel
@@ -14,4 +15,5 @@ val viewModelModule = module {
     viewModel{ AssessmentViewModel(repository = get(), savedStateHandle = get()) }
     viewModel{ PatientListingViewModel(repository = get()) }
     viewModel{ LoginViewModel(repository = get()) }
+    viewModel{ SignUpViewModel(repository = get()) }
 }
