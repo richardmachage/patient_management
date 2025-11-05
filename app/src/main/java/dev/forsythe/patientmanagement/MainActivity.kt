@@ -11,14 +11,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import dev.forsythe.patientmanagement.core.ui.navigation.NavRoutes
 import dev.forsythe.patientmanagement.core.ui.navigation.PmNavGraph
 import dev.forsythe.patientmanagement.core.ui.theme.PatientManagementTheme
+import org.koin.android.ext.android.inject
+import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
+
+    val viewModel : MainViewModel by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        installSplashScreen()
+            .setKeepOnScreenCondition {
+                viewModel.keepSplashScreen
+            }
+
         enableEdgeToEdge()
         setContent {
             PatientManagementTheme {
@@ -26,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
                 PmNavGraph(
                     navController = navController,
-                    startDestination = NavRoutes.PatientsList
+                    startDestination = viewModel.getStartDestination()
                 )
             }
         }
