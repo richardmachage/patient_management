@@ -159,11 +159,6 @@ class AssessmentViewModel(
             isValid = false
         }
 
-        // Conditional Validation
-
-        if (currentState.assessmentType == AssessmentType.GENERAL){
-            isValid = false
-        }
         
         return isValid
     }
