@@ -60,7 +60,6 @@ class PatientListingViewModel(
     }
 
     fun onPatientClicked(patientId: String) {
-        // TODO: Handle navigation to a patient detail screen
-        // e.g., _navigationEvent.value = ...
+       //TODO
     }
 }
