@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import dev.forsythe.patientmanagement.core.data.room.entities.assessment.AssessmentDao
 import dev.forsythe.patientmanagement.core.data.room.entities.assessment.AssessmentEntity
 import dev.forsythe.patientmanagement.core.data.room.entities.patients.PatientsDao
 import dev.forsythe.patientmanagement.core.data.room.entities.patients.PatientsEntity
+import dev.forsythe.patientmanagement.core.data.room.entities.vitals.VitalsDao
 import dev.forsythe.patientmanagement.core.data.room.entities.vitals.VitalsEntity
 import dev.forsythe.patientmanagement.core.ui.navigation.NavRoutes
 import kotlin.jvm.java
@@ -20,6 +22,9 @@ import kotlin.jvm.java
 abstract class PatientManagementDb : RoomDatabase(){
 
     abstract fun patientsDao(): PatientsDao
+    abstract fun assessmentDao() : AssessmentDao
+    abstract fun vitalsDao() : VitalsDao
+
 
     companion object {
         private var INSTANCE: PatientManagementDb? = null
