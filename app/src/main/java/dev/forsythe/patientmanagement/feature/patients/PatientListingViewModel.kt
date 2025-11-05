@@ -4,44 +4,49 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.forsythe.patientmanagement.core.data.repo.PatientRepository
 import dev.forsythe.patientmanagement.utils.convertMillisToDate
+import dev.forsythe.patientmanagement.utils.formatDateForDb
+import dev.forsythe.patientmanagement.utils.getTodayDateString
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class PatientListingViewModel(
-    repository: PatientRepository
+    private val repository: PatientRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PatientListingScreenState())
     val uiState = _uiState.asStateFlow()
 
+    private val _filterDate = MutableStateFlow<String?>(null)
+
     init {
-        // Set a default date for the filter UI
-        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-        _uiState.update { it.copy(filterDate = today) }
+        _uiState.update { it.copy(filterDate = "") }
 
         // Start collecting the patient list from the repository
-        loadPatients(repository)
+        loadPatients()
     }
 
-    private fun loadPatients(repository: PatientRepository) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun loadPatients() {
         viewModelScope.launch {
-            repository.getPatientListings()
+
+            _filterDate.flatMapLatest {dateInDbFormat->
+                repository.getPatientListings(filterDate = dateInDbFormat)
+            }
                 .catch { e ->
-                    // Handle any errors from the Flow
                     _uiState.update { it.copy(isLoading = false, error = e.message) }
                 }
-                .collect { patientList ->
-                    // This 'collect' will automatically trigger
-                    // every time the data changes in Room
+                .collect{patientList->
                     _uiState.update {
                         it.copy(
-                            isLoading = false,
-                            patients = patientList
+                            isLoading = false, patients = patientList
                         )
                     }
                 }
@@ -50,15 +55,21 @@ class PatientListingViewModel(
 
     // This function is called from the UI's date picker
     fun onFilterDateChanged(dateMillis: Long) {
-        val newDateString = convertMillisToDate(dateMillis)
-        _uiState.update { it.copy(filterDate = newDateString) }
+        val uiDateString = convertMillisToDate(dateMillis)
 
-        // TODO: Implement filtering logic
-        // This is where you would either filter the list client-side
-        // or re-query the repository if it supported date filtering.
-        // For now, it just updates the UI's date field.
+        val dbDateString = formatDateForDb(uiDateString)
+
+        _uiState.update { it.copy(filterDate = uiDateString) }
+
+        //Update the filterDate flow to triggers the query
+        _filterDate.value = dbDateString
     }
 
+
+    fun onClearFilter() {
+        _uiState.update { it.copy(filterDate = "") } // Clear the UI
+        _filterDate.value = null
+    }
     fun onPatientClicked(patientId: String) {
        //TODO
     }

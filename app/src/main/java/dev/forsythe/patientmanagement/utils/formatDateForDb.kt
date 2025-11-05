@@ -34,3 +34,8 @@ private val uiDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         null // Return null if string is empty or invalid
     }
 }
+
+
+fun getTodayDateString(): String {
+    return LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+}

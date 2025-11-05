@@ -132,10 +132,10 @@ class PatientRepoImpl (
         return withContext(Dispatchers.IO){patientsDao.getPatientByUniqueId(patientId)}
     }
 
-    override fun getPatientListings(): Flow<List<PatientListingItem>> {
+    override fun getPatientListings(filterDate : String?): Flow<List<PatientListingItem>> {
         return try {
 
-                patientsDao.getPatientsWithLatestVitals().map { patientWithVitalsList ->
+                patientsDao.getPatientsWithLatestVitals(filterDate).map { patientWithVitalsList ->
                         patientWithVitalsList.map { patientWithVital ->
                             val patient = patientWithVital.patient
                             val latestVital = patientWithVital.vital // This can be null

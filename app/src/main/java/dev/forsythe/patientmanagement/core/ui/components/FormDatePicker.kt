@@ -4,11 +4,13 @@ import android.R.attr.label
 import android.R.attr.singleLine
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +27,7 @@ fun FormDatePicker(
     value: String,
     onDateClick: () -> Unit,
     placeholder: String = "",
+    onClearClick: (() -> Unit)? = null,
 ) {
     Column(modifier = modifier) {
         Text(
@@ -38,12 +41,24 @@ fun FormDatePicker(
             readOnly = true,
             placeholder = { Text(placeholder) },
             trailingIcon = {
-                IconButton(
-                    onClick = onDateClick
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.CalendarToday, contentDescription = "Select Date"
-                    )
+                Row {
+
+                    IconButton(
+                        onClick = onDateClick
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CalendarToday,
+                            contentDescription = "Select Date"
+                        )
+                    }
+
+                    if (onClearClick != null && value.isNotEmpty()) {
+                        IconButton(onClick = onClearClick) {
+                            Icon(
+                                imageVector = Icons.Default.Clear, contentDescription = "Clear date"
+                            )
+                        }
+                    }
                 }
             },
             modifier = Modifier

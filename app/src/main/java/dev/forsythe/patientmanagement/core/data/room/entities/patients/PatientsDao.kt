@@ -53,6 +53,7 @@ interface PatientsDao {
                ROW_NUMBER() OVER(PARTITION BY patientId ORDER BY visitDate DESC) as rn
         FROM VitalsEntity
     ) AS v ON p.uniqueId = v.patientId AND v.rn = 1
-""")
-    fun getPatientsWithLatestVitals(): Flow<List<PatientWithLatestVital>>
+    WHERE (:filterDate IS NULL OR v.visitDate = :filterDate)
+    """)
+    fun getPatientsWithLatestVitals(filterDate: String?): Flow<List<PatientWithLatestVital>>
 }

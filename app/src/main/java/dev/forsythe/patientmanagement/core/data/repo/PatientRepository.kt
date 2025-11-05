@@ -5,6 +5,7 @@ import dev.forsythe.patientmanagement.core.data.room.entities.patients.PatientsE
 import dev.forsythe.patientmanagement.core.data.room.entities.vitals.VitalsEntity
 import dev.forsythe.patientmanagement.feature.patients.model.PatientListingItem
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 /**
  * Interface for the single source of truth for patient data.
@@ -63,7 +64,7 @@ interface PatientRepository {
      *
      * @return A Flow emitting a list of [PatientListingItem].
      */
-    fun getPatientListings(): Flow<List<PatientListingItem>>
+    fun getPatientListings(filterDate : String?): Flow<List<PatientListingItem>>
 
     /**
      * Checks if a patient with this unique ID already exists in the local DB.

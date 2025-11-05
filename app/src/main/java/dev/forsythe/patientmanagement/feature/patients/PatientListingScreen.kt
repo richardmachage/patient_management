@@ -94,7 +94,11 @@ fun PatientListingScreen(
                 label = "Filter by visit date",
                 value = uiState.filterDate,
                 onDateClick = {
-                    showDatePicker = true                }
+                    showDatePicker = true
+                },
+                onClearClick = {
+                    viewModel.onClearFilter()
+                }
             )
 
            /* if (patients.isEmpty()) {
