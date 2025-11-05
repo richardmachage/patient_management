@@ -26,7 +26,6 @@ val dataModule = module {
         PatientRepoImpl(
             api = get(),
             db = get(),
-            sharedPref = get(),
             accessTokenProvider = get()
         )
     }

@@ -34,7 +34,6 @@ class PatientRepoImpl (
     private val api: KtorClient,
     private val db: PatientManagementDb,
     private val accessTokenProvider: AccessTokenProvider,
-    private val sharedPref : SharedPreferences
 ) : PatientRepository {
 
     private val assessmentDao = db.assessmentDao()
@@ -56,9 +55,14 @@ class PatientRepoImpl (
 
 
                 // Save the token on success
-                sharedPref.saveData(
+                Timber.tag(TAG).d("gotten token : %s", logInData.access_token)
+                /*sharedPref.saveData(
                     key = SharedPreferences.ACCESS_TOKEN, value = logInData.access_token
-                )
+                )*/
+                accessTokenProvider.saveAccessToken(logInData.access_token)
+
+
+                Timber.tag(TAG).d("save token ${accessTokenProvider.requireAccessToken()}")
 
                 Timber.tag(TAG).d("Login successful")
                 Result.success(Unit)

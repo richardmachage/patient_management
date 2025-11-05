@@ -71,6 +71,8 @@ fun PatientListingScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
+                modifier = Modifier.padding(16.dp).padding(bottom = 30.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
                 onClick ={
                     navController.navigate(NavRoutes.Registration)
                 }
