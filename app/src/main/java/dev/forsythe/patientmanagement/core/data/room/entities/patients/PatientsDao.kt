@@ -29,6 +29,8 @@ interface PatientsDao {
     @Delete
     suspend fun deletePatient(patient: PatientsEntity)
 
+    @Query("UPDATE PatientsEntity SET isSynced = :isSynced WHERE uniqueId = :patientId")
+    suspend fun updatePatientSyncStatus(patientId: String, isSynced: Boolean)
 
     @Transaction
     @Query("""
@@ -56,4 +58,6 @@ interface PatientsDao {
     WHERE (:filterDate IS NULL OR v.visitDate = :filterDate)
     """)
     fun getPatientsWithLatestVitals(filterDate: String?): Flow<List<PatientWithLatestVital>>
+    
+    
 }

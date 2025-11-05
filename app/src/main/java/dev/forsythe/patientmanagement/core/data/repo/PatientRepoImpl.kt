@@ -6,7 +6,9 @@ import dev.forsythe.patientmanagement.core.data.preferences.SharedPreferences
 import dev.forsythe.patientmanagement.core.data.remote.KtorClient
 import dev.forsythe.patientmanagement.core.data.remote.logIn
 import dev.forsythe.patientmanagement.core.data.remote.model.request.LogInRequest
+import dev.forsythe.patientmanagement.core.data.remote.model.request.RegisterRequest
 import dev.forsythe.patientmanagement.core.data.remote.model.request.SignUpRequest
+import dev.forsythe.patientmanagement.core.data.remote.registerPatient
 import dev.forsythe.patientmanagement.core.data.remote.signUp
 import dev.forsythe.patientmanagement.core.data.room.db.PatientManagementDb
 import dev.forsythe.patientmanagement.core.data.room.entities.assessment.AssessmentEntity
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDate
@@ -81,7 +84,7 @@ class PatientRepoImpl (
     ): Result<Unit> {
         return withContext(Dispatchers.IO) {try {
             val request = SignUpRequest(email, firstName, lastName, password)
-            // Call the Ktor extension function
+
            val data =  api.signUp(request)
             Timber.tag(TAG).d(data.message)
             Result.success(Unit)
@@ -97,6 +100,33 @@ class PatientRepoImpl (
             try {
                 patientsDao.insertPatient(patient)
                 Timber.tag(TAG).d("Patient registered successfully")
+
+                launch {
+                    try {
+                        val token = accessTokenProvider.requireAccessToken()
+                        val request = RegisterRequest(
+                            dob = patient.dateOfBirth,
+                            firstname = patient.firstname,
+                            lastname = patient.lastname,
+                            reg_date = patient.regDate,
+                            unique = patient.uniqueId,
+                            gender = patient.gender
+                        )
+                        val response = api.registerPatient(request, token)
+
+                        // 4. If sync successful, update local flag
+
+                        patientsDao.updatePatientSyncStatus(
+                            patientId = patient.uniqueId,
+                            isSynced = true
+                        )
+                        Timber.tag(TAG).d("Patient synced to remote: ${patient.uniqueId}")
+
+                    } catch (e: Exception) {
+                        Timber.tag(TAG).e(e, "Local patient save OK, but remote sync failed.")
+                    }
+                }
+
                 Result.success(patient.uniqueId)
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e)
