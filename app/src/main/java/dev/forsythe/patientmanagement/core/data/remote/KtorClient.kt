@@ -2,7 +2,6 @@ package dev.forsythe.patientmanagement.core.data.remote
 
 import dev.forsythe.patientmanagement.utils.BASE_URL
 import io.ktor.client.HttpClient
-import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
