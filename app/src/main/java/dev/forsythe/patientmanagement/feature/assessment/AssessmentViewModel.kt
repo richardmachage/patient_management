@@ -24,6 +24,9 @@ class AssessmentViewModel(
     private val patientId: String = checkNotNull(savedStateHandle["patientId"])
     private val assessmentTypeString: String = checkNotNull(savedStateHandle["assessmentType"])
 
+    private val vitalId : String = checkNotNull(savedStateHandle["vitalId"])
+
+
     private val _uiState = MutableStateFlow(AssessmentScreenState())
     val uiState = _uiState.asStateFlow()
 
@@ -112,12 +115,13 @@ class AssessmentViewModel(
             // Create the single, unified entity
             val newAssessment = AssessmentEntity(
                 id = UUID.randomUUID().toString(),
-                patientId = patientId,
+                vitalId = vitalId,
                 visitDate = formatDateForDb(currentState.visitDate),
                 generalHealth = currentState.generalHealth?: GeneralHealth.Poor,
                 comments = currentState.comments,
                 onDiet = currentState.onDiet,
-                usingDrugs = currentState.onDrugs
+                usingDrugs = currentState.onDrugs,
+                patientId = patientId
             )
 
             val result = repository.saveAssessment(newAssessment)

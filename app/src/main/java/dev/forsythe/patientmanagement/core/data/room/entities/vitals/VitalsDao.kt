@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface VitalsDao {
+
+    @Query("UPDATE VitalsEntity SET isSynced = :isSynced WHERE id = :id")
+    suspend fun updateSyncStatus (id: String, isSynced: Boolean)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVitals(vitals: VitalsEntity)
 

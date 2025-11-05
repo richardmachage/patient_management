@@ -114,7 +114,8 @@ class VitalsViewModel(
                         isLoading = false, 
                         navigationEvent = VitalsNavigationEvent.ToAssessment(
                             patientId = patientId,
-                            assessmentType = assessmentType
+                            assessmentType = assessmentType,
+                            vitalId = newVitals.id
                         )
                     ) 
                 }

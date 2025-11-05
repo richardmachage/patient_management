@@ -75,7 +75,7 @@ fun PatientVitalsScreen(
                 is VitalsNavigationEvent.ToAssessment -> {
                     navController.navigate(
                         NavRoutes.Assessment(
-                            patientId = event.patientId, assessmentType = event.assessmentType
+                            patientId = event.patientId, assessmentType = event.assessmentType, vitalId = event.vitalId
                         )
                     ) {
                         // Pop this screen off the back stack

@@ -20,6 +20,6 @@ sealed interface NavRoutes {
     data class Vitals(val patientId : String) : NavRoutes
 
     @Serializable
-    data class Assessment(val patientId : String, val assessmentType : String) :  NavRoutes
+    data class Assessment(val patientId : String, val assessmentType : String, val vitalId : String) :  NavRoutes
 
 }

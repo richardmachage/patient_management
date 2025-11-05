@@ -1,10 +1,12 @@
 package dev.forsythe.patientmanagement.core.data.repo
 
-import android.R.attr.phoneNumber
 import dev.forsythe.patientmanagement.core.data.cache.AccessTokenProvider
-import dev.forsythe.patientmanagement.core.data.preferences.SharedPreferences
 import dev.forsythe.patientmanagement.core.data.remote.KtorClient
+import dev.forsythe.patientmanagement.core.data.remote.addVisit
+import dev.forsythe.patientmanagement.core.data.remote.addVital
 import dev.forsythe.patientmanagement.core.data.remote.logIn
+import dev.forsythe.patientmanagement.core.data.remote.model.request.AddVisitRequest
+import dev.forsythe.patientmanagement.core.data.remote.model.request.AddVitalsRequest
 import dev.forsythe.patientmanagement.core.data.remote.model.request.LogInRequest
 import dev.forsythe.patientmanagement.core.data.remote.model.request.RegisterRequest
 import dev.forsythe.patientmanagement.core.data.remote.model.request.SignUpRequest
@@ -15,15 +17,11 @@ import dev.forsythe.patientmanagement.core.data.room.entities.assessment.Assessm
 import dev.forsythe.patientmanagement.core.data.room.entities.patients.PatientsEntity
 import dev.forsythe.patientmanagement.core.data.room.entities.vitals.VitalsEntity
 import dev.forsythe.patientmanagement.core.model.BmiStatus
-import dev.forsythe.patientmanagement.feature.patients.BmiStatusChip
-import dev.forsythe.patientmanagement.feature.patients.PatientListItem
 import dev.forsythe.patientmanagement.feature.patients.model.PatientListingItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -112,10 +110,9 @@ class PatientRepoImpl (
                             unique = patient.uniqueId,
                             gender = patient.gender
                         )
-                        val response = api.registerPatient(request, token)
+                        api.registerPatient(request, token)
 
-                        // 4. If sync successful, update local flag
-
+                        //If sync successful, update local flag
                         patientsDao.updatePatientSyncStatus(
                             patientId = patient.uniqueId,
                             isSynced = true
@@ -138,9 +135,33 @@ class PatientRepoImpl (
     override suspend fun saveVitals(vitals: VitalsEntity): Result<String> {
         return withContext(Dispatchers.IO) {
 
+
             try {
                 vitalsDao.insertVitals(vitals)
                 Timber.tag(TAG).d("Vitals saved successfully")
+
+
+                launch {
+                    try {
+                        val token = accessTokenProvider.requireAccessToken()
+                        val request = AddVitalsRequest(
+                            patient_id = vitals.patientId,
+                            visit_date = vitals.visitDate,
+                            bmi = vitals.bmi.toString(),
+                            height = vitals.height.toString(),
+                            weight = vitals.weight.toString(),
+                        )
+                        api.addVital(token, request)
+
+                        vitalsDao.updateSyncStatus(
+                            id = vitals.id,
+                            isSynced = true
+                        )
+                    }catch (e : Exception){
+                        Timber.tag(TAG).e(e, "Local vitals save OK, but remote sync failed.")
+                    }
+                }
+
                 Result.success(vitals.id)
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e)
@@ -154,6 +175,30 @@ class PatientRepoImpl (
             try {
                 assessmentDao.insertAssessment(assessment)
                 Timber.tag(TAG).d("Assessment saved successfully")
+
+                launch {
+                    try {
+                        val token = accessTokenProvider.requireAccessToken()
+                        val request = AddVisitRequest(
+                            comments = assessment.comments ?: "",
+                            vital_id = assessment.vitalId,
+                            visit_date = assessment.visitDate,
+                            general_health = assessment.generalHealth.name,
+                            on_diet = if (assessment.onDiet ?: false) "Yes" else "No",
+                            on_drugs = if (assessment.usingDrugs ?: false) "Yes" else "No",
+                            patient_id = assessment.patientId,
+                        )
+                        api.addVisit(token = token, request =  request)
+
+                        assessmentDao.updateSyncStatus(
+                            id = assessment.vitalId,
+                            isSynced = true
+                        )
+                    }catch (e : Exception){
+                        Timber.tag(TAG).e(e, "Local assessment save OK, but remote sync failed.")
+                    }
+                }
+
                 Result.success(assessment.id)
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e)
