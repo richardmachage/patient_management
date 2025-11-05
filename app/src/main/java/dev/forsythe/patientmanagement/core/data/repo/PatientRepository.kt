@@ -16,7 +16,7 @@ interface PatientRepository {
 
     /**
      * Attempts to log in the user via the API.
-     * On success, saves the auth token to SharedPrefs.
+     * On success, saves the auth token
      * Returns a Result wrapper indicating success or failure.
      */
     suspend fun login(email: String, password: String): Result<Unit>
@@ -34,40 +34,31 @@ interface PatientRepository {
 
 
     /**
-     * Saves a new patient to the local Room database.
-     * The implementation will also enqueue a WorkManager job to sync this
-     * patient to the remote API.
+     * Saves a new patient
+
      */
     suspend fun registerPatient(patient: PatientsEntity) : Result<String>
 
 
 
     /**
-     * Saves a new vitals reading to the local Room database.
-     * The implementation will also enqueue a WorkManager job (chained to the
-     * patient sync) to sync these vitals to the remote API.
+     * Saves a new vitals reading
      */
     suspend fun saveVitals(vitals: VitalsEntity) : Result<String>
 
     /**
-     * Saves a new assessment to the local Room database.
-     * The implementation will also enqueue a WorkManager job (chained to the
-     * vitals sync) to sync this assessment to the remote API.
+     * Saves a new assessment
      */
     suspend fun saveAssessment(assessment: AssessmentEntity) : Result<String>
 
     
     /**
      * Gets a real-time stream of all patients for the patient listing page.
-     * This Flow will automatically update the UI whenever the Room database changes.
-     * It combines Patient and their latest Vitals for the BMI status.
-     *
-     * @return A Flow emitting a list of [PatientListingItem].
      */
     fun getPatientListings(filterDate : String?): Flow<List<PatientListingItem>>
 
     /**
-     * Checks if a patient with this unique ID already exists in the local DB.
+     * Checks if a patient with this unique ID already exists
      * This is for the Patient Registration form validation.
      */
     suspend fun doesPatientExist(patientId: String): Boolean
